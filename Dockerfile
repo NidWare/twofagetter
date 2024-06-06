@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY bot.py bot.py
+COPY main.py main.py
 
 VOLUME ["/app/db"]
 
