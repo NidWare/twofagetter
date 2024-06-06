@@ -9,4 +9,4 @@ COPY bot.py bot.py
 
 VOLUME ["/app/db"]
 
-CMD ["python", "bot.py"]
+CMD ["python", "main.py"]
