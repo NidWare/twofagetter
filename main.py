@@ -103,7 +103,7 @@ class TelegramBot:
 
 
 if __name__ == "__main__":
-    with open('path/to/your/file.yml', 'r') as file:
+    with open('config.yml', 'r') as file:
         config = yaml.safe_load(file)
     TOKEN = config.get('TOKEN')
     DB_PATH = "db.db"  # "/app/db.db"  # Path to your SQLite database in the container
