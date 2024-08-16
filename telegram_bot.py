@@ -44,13 +44,25 @@ class TelegramBot:
         update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
     def button(self, update: Update, context: CallbackContext) -> None:
+        if not self.check_if_user_has_rights(update):
+            return
+
         query = update.callback_query
 
         # CallbackQueries need to be answered, even if no notification to the user is needed
         query.answer()
 
-        # Here, you can handle what happens when a button is pressed
-        query.edit_message_text(text=f"Selected option: {query.data}")
+        user_id = query.data
+        if user_id.isdigit():
+            secret = self.db_manager.get_secret_by_id(user_id)
+            if secret:
+                auth_service = AuthenticatorModule()
+                code, time_remaining = auth_service.get_fresh_totp(secret)
+                update.message.reply_text(f"Code: {code}\nSeconds remain: {int(time_remaining)}")
+            else:
+                update.message.reply_text("ID not found.")
+        else:
+            update.message.reply_text("Please enter a valid numeric ID.")
 
     def add(self, update: Update, context: CallbackContext):
         """
