@@ -3,11 +3,12 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from authenticator import AuthenticatorModule
 from database import DatabaseManager
 
-ALLOWED_IDS = [6744940078, 6583143367, 7042153047]  # chaser, alex
+ALLOWED_IDS = [6744940078, 6583143367, 7042153047]  # chaser, rupert, liza
+TEAMLEAD_IDS = [102768495]
 
 class TelegramBot:
     def __init__(self, token, db_manager):
-        self.updater = UpUpdaterdater(token, use_context=True)
+        self.updater = Updater(token, use_context=True)
         self.dp = self.updater.dispatcher
         self.db_manager = db_manager
         self.setup_handlers()
@@ -17,6 +18,7 @@ class TelegramBot:
         Set up the command and message handlers for the bot.
         """
         self.dp.add_handler(CommandHandler("start", self.start))
+        self.dp.add_handler(CommandHandler("add", self.add()))
         self.dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self.handle_message))
 
     def start(self, update: Update, context: CallbackContext):
@@ -33,6 +35,26 @@ class TelegramBot:
         response = "\n".join([f"{entity['id']} - {entity['name']}" for entity in entities])
         update.message.reply_text(f"Here are the available entities:\n{response}")
 
+    def add(self, update: Update, context: CallbackContext):
+        """
+        Handle the /start command.
+
+        :param update: Telegram update object.
+        :param context: Callback context object.
+        """
+        if not self.check_if_user_has_rights(update):
+            return
+
+        text = update.message.text
+        commands = text.split()
+
+        id = commands[1]
+        name = commands[2]
+        code = commands[3]
+        self.db_manager.execute_query("INSERT INTO pages VALUES (?, ?, ?)", (id, name, code))
+        update.message.reply_text(f"Added {id} {name} {code}")
+
+
     def handle_message(self, update: Update, context: CallbackContext):
         """
         Handle incoming messages.
@@ -40,6 +62,10 @@ class TelegramBot:
         :param update: Telegram update object.
         :param context: Callback context object.
         """
+
+        # if update.effective_user.id in TEAMLEAD_IDS:
+        #     site_service =
+
         if not self.check_if_user_has_rights(update):
             return
 
