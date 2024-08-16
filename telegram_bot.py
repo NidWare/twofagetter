@@ -51,6 +51,10 @@ class TelegramBot:
         # CallbackQueries need to be answered, even if no notification to the user is needed
         query.answer()
 
+        if query.data == "start":
+            self.start(update, context)
+            return
+
         user_id = query.data
         if user_id.isdigit():
             secret = self.db_manager.get_secret_by_id(user_id)
