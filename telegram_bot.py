@@ -57,7 +57,7 @@ class TelegramBot:
             if secret:
                 auth_service = AuthenticatorModule()
                 code, time_remaining = auth_service.get_fresh_totp(secret)
-                button = [[InlineKeyboardButton("Заново", "/start")]]
+                button = [[InlineKeyboardButton("Заново", callback_data="start")]]
                 query.edit_message_text(text=f"Code: {code}\nSeconds remain: {int(time_remaining)}", reply_markup=InlineKeyboardMarkup(button))
             else:
                 query.edit_message_text(text="ID not found.")
