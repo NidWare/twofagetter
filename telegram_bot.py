@@ -19,6 +19,7 @@ class TelegramBot:
         """
         self.dp.add_handler(CommandHandler("start", self.start))
         self.dp.add_handler(CommandHandler("add", self.add))
+        self.dp.add_handler(CommandHandler("del", self.del))
         self.dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self.handle_message))
 
     def start(self, update: Update, context: CallbackContext):
@@ -37,7 +38,7 @@ class TelegramBot:
 
     def add(self, update: Update, context: CallbackContext):
         """
-        Handle the /start command.
+        Handle the /add command.
 
         :param update: Telegram update object.
         :param context: Callback context object.
@@ -51,9 +52,25 @@ class TelegramBot:
         id = commands[1]
         name = commands[2]
         code = commands[3]
-        print(id, name, code)
         self.db_manager.execute_query("INSERT INTO pages VALUES (?, ?, ?)", (id, name, code))
         update.message.reply_text(f"Added {id} {name} {code}")
+
+        def del(self, update: Update, context: CallbackContext):
+            """
+            Handle the /add command.
+
+            :param update: Telegram update object.
+            :param context: Callback context object.
+            """
+            if not self.check_if_user_has_rights(update):
+                return
+
+            text = update.message.text
+            commands = text.split()
+
+            id = commands[1]
+            self.db_manager.execute_query("DELETE FROM pages WHERE id = ?", id)
+            update.message.reply_text(f"Deleted model with {id}")
 
 
     def handle_message(self, update: Update, context: CallbackContext):
