@@ -38,7 +38,7 @@ class TelegramBot:
         buttons = []
 
         for page in pages:
-            buttons.append([InlineKeyboardButton(f"{page['name']}", callback_data=page['id'])])
+            buttons.append([InlineKeyboardButton(f"{page['id']} - {page['name']}", callback_data=page['id'])])
 
         reply_markup = InlineKeyboardMarkup(buttons)
         update.message.reply_text('Please choose:', reply_markup=reply_markup)
