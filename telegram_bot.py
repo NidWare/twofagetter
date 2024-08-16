@@ -58,11 +58,11 @@ class TelegramBot:
             if secret:
                 auth_service = AuthenticatorModule()
                 code, time_remaining = auth_service.get_fresh_totp(secret)
-                update.message.reply_text(f"Code: {code}\nSeconds remain: {int(time_remaining)}")
+                query.edit_message_text(text=f"Code: {code}\nSeconds remain: {int(time_remaining)}")
             else:
-                update.message.reply_text("ID not found.")
+                query.edit_message_text(text="ID not found.")
         else:
-            update.message.reply_text("Please enter a valid numeric ID.")
+            query.edit_message_text(text="Please enter a valid numeric ID.")
 
     def add(self, update: Update, context: CallbackContext):
         """
