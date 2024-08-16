@@ -18,7 +18,7 @@ class TelegramBot:
         Set up the command and message handlers for the bot.
         """
         self.dp.add_handler(CommandHandler("start", self.start))
-        self.dp.add_handler(CommandHandler("add", self.add()))
+        self.dp.add_handler(CommandHandler("add", self.add))
         self.dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self.handle_message))
 
     def start(self, update: Update, context: CallbackContext):
