@@ -1,5 +1,6 @@
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
 from authenticator import AuthenticatorModule
 from database import DatabaseManager
 
@@ -20,6 +21,7 @@ class TelegramBot:
         self.dp.add_handler(CommandHandler("start", self.start))
         self.dp.add_handler(CommandHandler("add", self.add))
         self.dp.add_handler(CommandHandler("del", self.delete))
+        self.dp.add_handler(CallbackQueryHandler(self.button))
         self.dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self.handle_message))
 
     def start(self, update: Update, context: CallbackContext):
@@ -32,9 +34,23 @@ class TelegramBot:
         if not self.check_if_user_has_rights(update):
             return
 
-        entities = self.db_manager.get_entities()
-        response = "\n".join([f"{entity['id']} - {entity['name']}" for entity in entities])
-        update.message.reply_text(f"Here are the available entities:\n{response}")
+        pages = self.db_manager.get_entities()
+        buttons = []
+
+        for page in pages:
+            buttons.append([InlineKeyboardButton(f"{page['name']}", callback_data=page['id'])])
+
+        reply_markup = InlineKeyboardMarkup(buttons)
+        update.message.reply_text('Please choose:', reply_markup=reply_markup)
+
+    def button(self, update: Update, context: CallbackContext) -> None:
+        query = update.callback_query
+
+        # CallbackQueries need to be answered, even if no notification to the user is needed
+        query.answer()
+
+        # Here, you can handle what happens when a button is pressed
+        query.edit_message_text(text=f"Selected option: {query.data}")
 
     def add(self, update: Update, context: CallbackContext):
         """
