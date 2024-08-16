@@ -11,7 +11,7 @@ start() {
     docker stop $CONTAINER_NAME 2>/dev/null || true
     docker rm $CONTAINER_NAME 2>/dev/null || true
     echo "Starting a new container..."
-    docker run -d --name $CONTAINER_NAME -v $DB_PATH:/app/db.db $IMAGE_NAME
+    docker run -d --restart unless-stopped --name $CONTAINER_NAME -v $DB_PATH:/app/db.db $IMAGE_NAME
     echo "Container started successfully."
 }
 
