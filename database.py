@@ -10,15 +10,31 @@ class DatabaseManager:
 
         :param query: SQL query to execute.
         :param params: Parameters for the SQL query.
-        :return: List of dictionaries representing the query results.
+        :return: List of dictionaries representing the query results (for SELECT queries).
+                 None for queries that don't return results.
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        cursor.execute(query, params)
-        rows = cursor.fetchall()
-        column_names = [description[0] for description in cursor.description]
-        conn.close()
-        return [dict(zip(column_names, row)) for row in rows]
+
+        try:
+            cursor.execute(query, params)
+
+            # If it's a SELECT query, fetch and return the results
+            if query.strip().lower().startswith("select"):
+                rows = cursor.fetchall()
+                column_names = [description[0] for description in cursor.description]
+                return [dict(zip(column_names, row)) for row in rows]
+            else:
+                # For INSERT, UPDATE, DELETE, etc., commit the transaction
+                conn.commit()
+                return None
+        except Exception as e:
+            conn.rollback()  # Rollback in case of error
+            print(f"An error occurred: {e}")
+            raise
+        finally:
+            cursor.close()
+            conn.close()
 
     def get_entities(self):
         """
