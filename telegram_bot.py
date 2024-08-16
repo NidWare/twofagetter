@@ -40,7 +40,7 @@ class TelegramBot:
             buttons.append([InlineKeyboardButton(f"{page['id']} - {page['name']}", callback_data=page['id'])])
 
         reply_markup = InlineKeyboardMarkup(buttons)
-        update.message.reply_text('Please choose:', reply_markup=reply_markup)
+        update.message.reply_text('Choose page / Выберите Страницу', reply_markup=reply_markup)
 
     def button(self, update: Update, context: CallbackContext) -> None:
         if not self.check_if_user_has_rights(update):
@@ -52,7 +52,13 @@ class TelegramBot:
         query.answer()
 
         if query.data == "start":
-            self.start(update, context)
+            pages = self.db_manager.get_entities()
+            buttons = []
+
+            for page in pages:
+                buttons.append([InlineKeyboardButton(f"{page['id']} - {page['name']}", callback_data=page['id'])])
+
+            query.edit_message_text("Choose page / Выберите Страницу:", reply_markup=InlineKeyboardMarkup(buttons))
             return
 
         user_id = query.data
