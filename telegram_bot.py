@@ -22,7 +22,6 @@ class TelegramBot:
         self.dp.add_handler(CommandHandler("add", self.add))
         self.dp.add_handler(CommandHandler("del", self.delete))
         self.dp.add_handler(CallbackQueryHandler(self.button))
-        self.dp.add_handler(MessageHandler(Filters.text & ~Filters.command, self.handle_message))
 
     def start(self, update: Update, context: CallbackContext):
         """
@@ -58,7 +57,8 @@ class TelegramBot:
             if secret:
                 auth_service = AuthenticatorModule()
                 code, time_remaining = auth_service.get_fresh_totp(secret)
-                query.edit_message_text(text=f"Code: {code}\nSeconds remain: {int(time_remaining)}")
+                button = [[InlineKeyboardButton("Заново", "/start")]]
+                query.edit_message_text(text=f"Code: {code}\nSeconds remain: {int(time_remaining)}", reply_markup=InlineKeyboardMarkup(button))
             else:
                 query.edit_message_text(text="ID not found.")
         else:
@@ -100,32 +100,6 @@ class TelegramBot:
         self.db_manager.execute_query("DELETE FROM pages WHERE id = ?", id)
         update.message.reply_text(f"Deleted model with {id}")
 
-
-    def handle_message(self, update: Update, context: CallbackContext):
-        """
-        Handle incoming messages.
-
-        :param update: Telegram update object.
-        :param context: Callback context object.
-        """
-
-        # if update.effective_user.id in TEAMLEAD_IDS:
-        #     site_service =
-
-        if not self.check_if_user_has_rights(update):
-            return
-
-        user_id = update.message.text.strip()
-        if user_id.isdigit():
-            secret = self.db_manager.get_secret_by_id(user_id)
-            if secret:
-                auth_service = AuthenticatorModule()
-                code, time_remaining = auth_service.get_fresh_totp(secret)
-                update.message.reply_text(f"Code: {code}\nSeconds remain: {int(time_remaining)}")
-            else:
-                update.message.reply_text("ID not found.")
-        else:
-            update.message.reply_text("Please enter a valid numeric ID.")
 
     def check_if_user_has_rights(self, update: Update) -> bool:
         """
