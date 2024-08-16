@@ -87,11 +87,11 @@ class TelegramBot:
         text = update.message.text
         commands = text.split()
 
-        id = commands[1]
-        name = commands[2]
-        code = commands[3]
+        # id = commands[1]
+        name = commands[1]
+        code = commands[2]
         self.db_manager.execute_query("INSERT INTO pages (name, secret) VALUES (?, ?)", (id, name, code))
-        update.message.reply_text(f"Added {id} {name} {code}")
+        update.message.reply_text(f"Added {name} {code}")
 
     def delete(self, update: Update, context: CallbackContext):
         """
