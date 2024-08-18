@@ -104,10 +104,10 @@ class TelegramBot:
             return
 
         text = update.message.text
-        commands = text.split()
 
+        commands = text.split()
         id = commands[1]
-        self.db_manager.execute_query("DELETE FROM pages WHERE id = ?", id)
+        self.db_manager.execute_query("DELETE FROM pages WHERE id = ?", (id,))
         update.message.reply_text(f"Deleted model with {id}")
 
 
