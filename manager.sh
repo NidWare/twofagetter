@@ -30,8 +30,13 @@ case "$1" in
     stop)
         stop
         ;;
+    deploy)
+      stop
+      git pull
+      start
+      ;;
     *)
-        echo "Usage: $0 {start|stop}"
+        echo "Usage: $0 {start|stop|deploy}"
         exit 1
         ;;
 esac
